@@ -1,4 +1,3 @@
-# storacha_client/config.py
 import os
 from dotenv import load_dotenv
 

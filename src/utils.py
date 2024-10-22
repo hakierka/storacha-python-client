@@ -1,4 +1,3 @@
-# storacha_client/utils.py
 def handle_api_errors(response):
     """Handle any errors returned by the API."""
     if response.status_code != 200:

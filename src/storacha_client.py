@@ -1,4 +1,3 @@
-# storacha_client/storacha_client.py
 import os
 import requests
 from .config import Config

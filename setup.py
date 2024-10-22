@@ -1,4 +1,3 @@
-# setup.py
 from setuptools import setup, find_packages
 
 setup(
@@ -10,9 +9,9 @@ setup(
         'python-dotenv',
     ],
     description='Python client for interacting with Storacha decentralized storage',
-    author='Your Name',
-    author_email='your_email@example.com',
-    url='https://github.com/yourusername/storacha-python-client',
+    author='Amy Waliszewska',
+    author_email='amy@storacha.network',
+    url='https://github.com/hakierka/storacha-python-client',
     classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
