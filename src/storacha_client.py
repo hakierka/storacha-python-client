@@ -1,50 +1,31 @@
+# storacha_client/storacha_client.py
 import os
 import requests
-from src.config import Config
-from src.utils import load_delegation_token, validate_response
+from .config import Config
+from .utils import handle_api_errors
 
 class StorachaClient:
-    def __init__(self):
-        Config.validate()
+    def __init__(self, x_auth_secret=None, authorization_token=None):
+        # Initialize from environment variables if not provided explicitly
         self.headers = {
-            'X-Auth-Secret': Config.X_AUTH_SECRET,
-            'Authorization': Config.AUTHORIZATION_TOKEN
+            'X-Auth-Secret': x_auth_secret or Config.X_AUTH_SECRET,
+            'Authorization': authorization_token or Config.AUTHORIZATION_TOKEN,
         }
-        self.upload_url = Config.UPLOAD_URL
+        self.base_url = 'https://up.storacha.network/bridge'
 
-    def upload_file(self, file_path, cid, file_size):
-        """Upload a file using UCAN bridge."""
+    def upload_file(self, cid, file_size, did):
+        """Upload a file to Storacha using UCAN bridge."""
         data = {
             "tasks": [
                 [
-                    "store/add",
-                    "did:key:your-did",
+                    "store/add", 
+                    did,  # User's DID
                     {"link": {"/": cid}, "size": file_size}
                 ]
             ]
         }
-        
-        # Step 1: Make the initial POST request
-        response = requests.post(self.upload_url, headers=self.headers, json=data)
-        validate_response(response)
-        
-        upload_info = response.json()
-        upload_url = upload_info[0]['p']['out']['ok']['url']
-        status = upload_info[0]['p']['out']['ok']['status']
+        # Perform the API request
+        response = requests.post(self.base_url, headers=self.headers, json=data)
+        handle_api_errors(response)
+        return response.json()
 
-        # Step 2: If status is 'upload', upload the file using PUT request
-        if status == 'upload':
-            with open(file_path, 'rb') as file_data:
-                put_response = requests.put(upload_url, headers=self.headers, data=file_data)
-                validate_response(put_response)
-            print("File uploaded successfully!")
-        else:
-            raise Exception("Upload status not set to 'upload'")
-
-# Usage Example
-if __name__ == "__main__":
-    client = StorachaClient()
-    file_path = "path/to/hen.jpeg"
-    cid = "bafybeiapg57lfsxpz75qthv3tcys5i4zsnsy3lxgtzdykpvc74enl5jdjy"  # Replace with the CID from IPFS
-    file_size = 13312  # Replace with the actual file size of hen.jpeg in bytes
-    client.upload_file(file_path, cid, file_size)
