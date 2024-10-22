@@ -1,0 +1,12 @@
+README.md
+setup.py
+storacha_client/__init__.py
+storacha_client/config.py
+storacha_client/storacha_client.py
+storacha_client/utils.py
+storacha_python_client.egg-info/PKG-INFO
+storacha_python_client.egg-info/SOURCES.txt
+storacha_python_client.egg-info/dependency_links.txt
+storacha_python_client.egg-info/requires.txt
+storacha_python_client.egg-info/top_level.txt
+tests/test_storacha_client.py
