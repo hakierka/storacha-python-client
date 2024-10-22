@@ -1,19 +1,25 @@
 import os
 import requests
-from .config import Config
-from .utils import handle_api_errors
 
 class StorachaClient:
     def __init__(self, x_auth_secret=None, authorization_token=None):
-        # Initialize from environment variables if not provided explicitly
+        # Initialize headers with the passed tokens or environment variables
         self.headers = {
-            'X-Auth-Secret': x_auth_secret or Config.X_AUTH_SECRET,
-            'Authorization': authorization_token or Config.AUTHORIZATION_TOKEN,
+            'X-Auth-Secret': x_auth_secret or os.getenv("X_AUTH_SECRET"),
+            'Authorization': f'Bearer {authorization_token or os.getenv("AUTHORIZATION_TOKEN")}'
         }
+        
+        if not self.headers['X-Auth-Secret'] or not self.headers['Authorization']:
+            raise ValueError("X-Auth-Secret or Authorization token missing.")
+        
         self.base_url = 'https://up.storacha.network/bridge'
+        
+        # Print headers for debugging purposes
+        print("X_AUTH_SECRET:", self.headers['X-Auth-Secret'])
+        print("Authorization:", self.headers['Authorization'])
 
     def upload_file(self, cid, file_size, did):
-        """Upload a file to Storacha using UCAN bridge."""
+        # Define the payload
         data = {
             "tasks": [
                 [
@@ -23,8 +29,12 @@ class StorachaClient:
                 ]
             ]
         }
-        # Perform the API request
-        response = requests.post(self.base_url, headers=self.headers, json=data)
-        handle_api_errors(response)
-        return response.json()
 
+        # Send the request
+        response = requests.post(self.base_url, headers=self.headers, json=data)
+
+        # Check for errors
+        if response.status_code != 200:
+            raise Exception(f"API Request failed with status code {response.status_code}: {response.text}")
+
+        return response.json()

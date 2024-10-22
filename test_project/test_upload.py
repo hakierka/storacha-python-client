@@ -1,6 +1,4 @@
-import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from dotenv import load_dotenv
 from storacha_client import StorachaClient
 
@@ -11,21 +9,24 @@ load_dotenv()
 X_AUTH_SECRET = os.getenv("X_AUTH_SECRET")
 AUTHORIZATION_TOKEN = os.getenv("AUTHORIZATION_TOKEN")
 
-# Check if environment variables are loaded correctly
+# Check that the environment variables are loaded
 if not X_AUTH_SECRET or not AUTHORIZATION_TOKEN:
     raise ValueError("Missing X_AUTH_SECRET or AUTHORIZATION_TOKEN")
 
-# Initialize the Storacha Client
-client = StorachaClient()
+# Initialize StorachaClient
+client = StorachaClient(x_auth_secret=X_AUTH_SECRET, authorization_token=AUTHORIZATION_TOKEN)
+
+# Print headers for debugging purposes
+print("Headers:", client.headers)
 
 # Example CID and file size for testing
-cid = "bafybeiapg57lfsxpz75qthv3tcys5i4zsnsy3lxgtzdykpvc74enl5jdjy"  # Replace with actual CID
-file_size = 12345  # Replace with actual file size in bytes
-did = "did:key:z6MkvP5JSRcjenRaiNQpb51uG88z8Mbj82HK8qGmHmEPZZnh"  # Replace with your DID
+cid = "bafybeiapg57lfsxpz75qthv3tcys5i4zsnsy3lxgtzdykpvc74enl5jdjy"  # Replace with actual IPFS CID
+file_size = 12288  # Replace with the actual file size
+did = "did:key:your-did"  # Replace with your DID
 
-# Upload the file
 try:
+    # Attempt to upload the file
     response = client.upload_file(cid, file_size, did)
-    print(f"Upload Response: {response}")
+    print(f"Upload successful: {response}")
 except Exception as e:
     print(f"Error occurred: {e}")
